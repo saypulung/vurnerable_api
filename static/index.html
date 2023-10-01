@@ -1,0 +1,109 @@
+<html>
+  <head>
+    <title>Example Vurnerable API</title>
+    <link href="style.css" rel="stylesheet"/>
+    <script src="jquery-2.1.1.min.js"></script>
+  </head>
+  <body>
+    <div class="form-login">
+      <form id="login">
+        <div class="form-input">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Type your username"/>
+        </div>
+        <div class="form-input">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Type your password"/>
+        </div>
+        <div class="form-input">
+          <button type="button" id="doLogin">Login</button>
+        </div>
+      </form>
+    </div>
+    <div class="list-projects hide">
+      <ul>
+
+      </ul>
+    </div>
+    <script type="text/javascript">
+      $(document).ready(() => {
+        let isLoggedIn = false;
+        let user = {};
+        const baseUrl = 'http://localhost:3001/';
+        const jwt = localStorage.getItem('token');
+        const findProject = () => {
+          $.ajax({
+            url: `${baseUrl}project_by_group`,
+            beforeSend: (xhr) => {
+              xhr.setRequestHeader('Authorization', `Bearer ${jwt}`);
+            },
+            success: (response) => {
+              if (response.data) {
+                $.each(response.data, (index, data) => {
+                  console.log(data);
+                  const project = `<li>${data.id} - ${data.project} (${data.nilai})</li>`;
+                  $('.list-projects ul').append(project);
+                });
+              }
+            }
+          })
+        };
+        if (jwt) {
+          $.ajax({
+            url: `${baseUrl}me`,
+            dataType: 'json',
+            error: (xhr, status) => {
+
+            },
+            beforeSend: (xhr) => {
+              xhr.setRequestHeader('Authorization', `Bearer ${jwt}`);
+            },
+            statusCode: {
+              200: (response) => {
+                console.log('return 200', response);
+                user = response;
+                $('.form-login').addClass('hide');
+                $('.list-projects').removeClass('hide');
+                isLoggedIn = true;
+                findProject();
+              },
+              500: (response) => {
+                console.log('return 500');
+              },
+              401: (response) => {
+                console.log('return 401');
+              },
+              403: (response) => {
+                console.log('return 500');
+              }
+            }
+          });
+        }
+        if (isLoggedIn) {
+          findProject();
+        } else {
+          $('#doLogin').click(() => {
+            const username = $('#username').val();
+            const password = $('#password').val();
+            $.ajax({
+              url: `${baseUrl}login`,
+              data: JSON.stringify({username, password}),
+              contentType: "application/json; charset=utf-8",
+              type: 'post',
+              dataType: 'json',
+              statusCode: {
+                200: (response) => {
+                  localStorage.setItem('token', response.token);
+                  location.reload();
+                },
+                403: (response) => {
+                  alert('Login salah');
+                }
+              }
+            })
+          })
+        }
+      });
+    </script>
+  </body>
+</html>

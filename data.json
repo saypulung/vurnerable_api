@@ -1,0 +1,34 @@
+{
+    "data": [
+        {
+            "id": 1,
+            "project": "Membangun Jembatan Tukad Badung",
+            "group": 1,
+            "nilai": "1 M"
+        },
+        {
+            "id": 2,
+            "project": "Membangun Jembatan Tukad Barito",
+            "group": 1,
+            "nilai": "2 M"
+        },
+        {
+            "id": 3,
+            "project": "Membangun Tol Tukad Ampel",
+            "group": 1,
+            "nilai": "3 M"
+        },
+        {
+            "id": 4,
+            "project": "Perbaikan Jalan Merdeka",
+            "group": 2,
+            "nilai": "1.5 M"
+        },
+        {
+            "id": 5,
+            "project": "Membangun Jalan Proklamasi",
+            "group": 2,
+            "nilai": "3.5 M"
+        }
+    ]
+}

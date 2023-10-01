@@ -1,0 +1,26 @@
+[
+    {
+        "username": "joko",
+        "group": 1,
+        "pass": "123",
+        "fullname": "Superman"
+    },
+    {
+        "username": "joki",
+        "group": 2,
+        "pass": "124",
+        "fullname": "Suparman"
+    },
+    {
+        "username": "joke",
+        "group": 1,
+        "pass": "125",
+        "fullname": "Spiderman"
+    },
+    {
+        "username": "joka",
+        "group": 2,
+        "pass": "126",
+        "fullname": "Molorman"
+    }
+]
