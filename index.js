@@ -48,8 +48,8 @@ app.post('/login', (req, res) => {
     }
     res.status(status).json(resBody);
 });
-app.get('/project_by_group/:id', [authenticateToken, (req, res) => {
-    const { id } = req.params;
+app.get('/project_by_group', [authenticateToken, (req, res) => {
+    const id = req.user.group;
     const projects = data.data.filter(e => e.group == id);
     if (projects)
     {
