@@ -1,7 +1,7 @@
 {
   "name": "vurnerable_api",
   "version": "1.0.0",
-  "description": "",
+  "description": "https://owasp.org/www-community/attacks/Web_Parameter_Tampering#:~:text=The%20Web%20Parameter%20Tampering%20attack,and%20quantity%20of%20products%2C%20etc.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
