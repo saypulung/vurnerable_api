@@ -3,34 +3,137 @@
     <title>Example Vurnerable API</title>
     <link href="style.css" rel="stylesheet"/>
     <script src="jquery-2.1.1.min.js"></script>
+    <script src="popper.min.js"></script>
+    <script src="jquery.validate.min.js"></script>
+    <script src="additional-methods.min.js"></script>
+    <script src="boostrap5/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="boostrap5/css/bootstrap.min.css">
+    <script>
+      function htmlEncode(str){
+        return String(str).replace(/[^\w. ]/gi, function(c){
+          return '&#'+c.charCodeAt(0)+';';
+        });
+      }
+      function cleanXss(content) {
+        const reg = /<script[^~]{0,}<\/script>|<style[^~]{0,}<\/style>|<input([^~]{0,})|;base64,|(<link|javascript:([^~]{0,})|<meta|<embed|<object)[^~]+\*?(?:>)|(?=<*)(( |\/)on[a-z]{0,}=)[^~]+\*?(?=>)/igm;
+        return content.replace(reg, '');
+      }
+    </script>
   </head>
   <body>
-    <div class="form-login">
-      <form id="login">
-        <div class="form-input">
-          <label for="username">Username</label>
-          <input type="text" id="username" placeholder="Type your username"/>
-        </div>
-        <div class="form-input">
-          <label for="password">Password</label>
-          <input type="password" id="password" placeholder="Type your password"/>
-        </div>
-        <div class="form-input">
-          <button type="button" id="doLogin">Login</button>
-        </div>
-      </form>
+    <div class="form-login container">
+      <div class="d-flex justify-content-center">
+        <form id="login">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input class="form-control" type="text" id="username" placeholder="Type your username"/>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input class="form-control" type="password" id="password" placeholder="Type your password"/>
+          </div>
+          <div class="form-group mt-3">
+            <button class="btn btn-primary" type="button" id="doLogin">Login</button>
+          </div>
+        </form>
+      </div>
     </div>
-    <div class="list-projects hide">
-      <ul>
-
+    <div class="user-login hide">
+      <ul class="nav nav-tabs" id="tabMenu" role="tabMenu">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="project-tab" data-bs-toggle="tab"
+            data-bs-target="#project-tab-pane" type="button" role="tab"
+            aria-controls="project-tab-pane" aria-selected="true">Project</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="create-project-tab" data-bs-toggle="tab"
+            data-bs-target="#create-project-tab-pane" type="button" role="tab"
+            aria-controls="create-project-tab-pane">Form Project</button>
+        </li>
       </ul>
+      <div class="tab-content" id="tabMenuContent">
+        <div class="tab-pane fade show active" id="project-tab-pane" role="tabpanel" 
+        aria-labelledby="project-tab" tabindex="0">
+          <div class="list-projects hide">
+            <ul class="list-group">
+      
+            </ul>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="create-project-tab-pane" role="tabpanel"
+          aria-labelledby="create-project-tab" tabindex="0">
+          <div class="m-3">
+            <form id="createProyekForm">
+              <div class="mb-3">
+                <label for="idProyek" class="form-label">ID Proyek</label>
+                <input type="text" name="idProyek" class="form-control" id="idProyek" required>
+              </div>
+              <div class="mb-3">
+                <label for="namaProyek" class="form-label">Nama Proyek</label>
+                <input type="text" name="namaProyek" class="form-control" id="namaProyek" required>
+              </div>
+              <div class="mb-3">
+                <label for="groupId" class="form-label">Group ID</label>
+                <input type="text" name="groupId" class="form-control" id="groupId" required>
+              </div>
+              <div class="mb-3">
+                <label for="nilaiProyek" class="form-label">Nilai Proyek</label>
+                <input type="text" name="nilaiProyek" class="form-control" id="nilaiProyek">
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+          
+        </div>
+      </div>
     </div>
     <script type="text/javascript">
       $(document).ready(() => {
-        let isLoggedIn = false;
-        let user = {};
         const baseUrl = 'http://localhost:3001/';
         const jwt = localStorage.getItem('token');
+        $('#createProyekForm').validate({
+          rules: {
+            idProyek: {
+              required: true,
+              digits: true
+            },
+            namaProyek: {
+              required: true,
+              minlength: 10,
+              maxlength: 50
+            },
+            groupId: {
+              required: true,
+              digits: true
+            }
+          },
+          submitHandler: (form) => {
+            $('#namaProyek').val(htmlEncode($('#namaProyek').val()));
+            const payload = {
+              id: parseInt($('#idProyek').val()),
+              project: $('#namaProyek').val(),
+              group: $('#groupId').val(),
+              nilai: $('#nilaiProyek').val()
+            }
+            $.ajax({
+              url: `${baseUrl}add-data`,
+              type: 'post',
+              dataType: 'json',
+              data: JSON.stringify(payload),
+              contentType: "application/json; charset=utf-8",
+              beforeSend: (xhr) => {
+                xhr.setRequestHeader('Authorization', `Bearer ${jwt}`);
+              },
+              success: (response) => {
+                location.reload();
+              }
+            })
+            return false;
+          }
+        });
+        let isLoggedIn = false;
+        let user = {};
+
         const findProject = () => {
           $.ajax({
             url: `${baseUrl}project_by_group`,
@@ -41,7 +144,7 @@
               if (response.data) {
                 $.each(response.data, (index, data) => {
                   console.log(data);
-                  const project = `<li>${data.id} - ${data.project} (${data.nilai})</li>`;
+                  const project = `<li class="list-group-item">${data.id} - ${data.project} (${data.nilai})</li>`;
                   $('.list-projects ul').append(project);
                 });
               }
@@ -64,6 +167,7 @@
                 user = response;
                 $('.form-login').addClass('hide');
                 $('.list-projects').removeClass('hide');
+                $('.user-login').removeClass('hide');
                 isLoggedIn = true;
                 findProject();
               },

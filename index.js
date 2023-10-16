@@ -1,4 +1,4 @@
-const data = require('./data.json');
+let data = require('./data.json');
 const users = require('./users.json');
 const express = require('express');
 const jwt = require('jsonwebtoken');
@@ -60,6 +60,15 @@ app.get('/project_by_group', [authenticateToken, (req, res) => {
 }]);
 app.get('/me', [authenticateToken, (req, res) => {
     res.json(req.user);
+}]);
+
+app.post('/add-data', [authenticateToken, (req, res) => {
+    const projectBody = req.body;
+    const projects = data.data;
+    data.data.push(projectBody);
+    console.log(data);
+    console.log(projectBody);
+    res.json(projectBody);
 }]);
 
 app.listen(3001, console.log('Running'));

@@ -5,3 +5,10 @@ body {
 .hide {
     display: none;
 }
+#login {
+    width: 500px;
+}
+form label.error {
+    color: rgb(161, 32, 32);
+    font-size: smaller;
+}
