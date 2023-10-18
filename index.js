@@ -2,6 +2,7 @@ let data = require('./data.json');
 const users = require('./users.json');
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -27,6 +28,20 @@ function authenticateToken(req, res, next) {
       next();
     });
 }
+
+const validateFormProject = [
+    body('id', 'empty ID proyek')
+        .trim()
+        .isInt(),
+    body('project', 'nama proyek')
+        .trim()
+        .isString()
+        .isLength({min: 10, max: 50})
+        .withMessage('length invalid'),
+    body('group', 'group id')
+        .trim()
+        .isInt()
+];
 
 app.post('/login', (req, res) => {
     let status = 200;
@@ -62,13 +77,21 @@ app.get('/me', [authenticateToken, (req, res) => {
     res.json(req.user);
 }]);
 
-app.post('/add-data', [authenticateToken, (req, res) => {
-    const projectBody = req.body;
-    const projects = data.data;
-    data.data.push(projectBody);
-    console.log(data);
-    console.log(projectBody);
-    res.json(projectBody);
+app.post('/add-data', [authenticateToken, validateFormProject, (req, res) => {
+    const result = validationResult(req);
+    console.log(result);
+    if (result.isEmpty())
+    {
+        const projectBody = req.body;
+        const projects = data.data;
+        data.data.push(projectBody);
+        console.log(data);
+        console.log(projectBody);
+        res.json(projectBody);
+    } else {
+        
+        res.status(403).json({message: 'invalid parameter'});
+    }
 }]);
 
 app.listen(3001, console.log('Running'));
