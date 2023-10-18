@@ -136,7 +136,7 @@
 
         const findProject = () => {
           $.ajax({
-            url: `${baseUrl}project_by_group`,
+            url: `${baseUrl}project_by_group/${user.group}`,
             beforeSend: (xhr) => {
               xhr.setRequestHeader('Authorization', `Bearer ${jwt}`);
             },
