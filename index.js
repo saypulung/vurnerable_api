@@ -89,8 +89,7 @@ app.post('/add-data', [authenticateToken, validateFormProject, (req, res) => {
         console.log(projectBody);
         res.json(projectBody);
     } else {
-        
-        res.status(403).json({message: 'invalid parameter'});
+        res.status(403).json({message: 'invalid parameter', errors: result.errors});
     }
 }]);
 
